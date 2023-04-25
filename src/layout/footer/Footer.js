@@ -149,7 +149,7 @@ const Footer = () => {
                 {t("common:footer-follow-us")}
               </span>
               <ul className="text-sm flex">
-                <li className="flex items-center mr-3 transition ease-in-out duration-500">
+                {/* <li className="flex items-center mr-3 transition ease-in-out duration-500">
                   <Link href="https://www.facebook.com">
                     <a
                       aria-label="Social Link"
@@ -184,9 +184,9 @@ const Footer = () => {
                       <PinterestIcon size={34} round />
                     </a>
                   </Link>
-                </li>
+                </li> */}
                 <li className="flex items-center  mr-3 transition ease-in-out duration-500">
-                  <Link href="https://www.linkedin.com">
+                  <Link href="https://www.linkedin.com/in/tranhongtri/">
                     <a
                       aria-label="Social Link"
                       rel="noreferrer"
@@ -197,23 +197,11 @@ const Footer = () => {
                     </a>
                   </Link>
                 </li>
-                <li className="flex items-center  mr-3 transition ease-in-out duration-500">
-                  <Link href="https://www.whatsapp.com">
-                    <a
-                      aria-label="Social Link"
-                      rel="noreferrer"
-                      target="_blank"
-                      className="block text-center mx-auto text-gray-500 hover:text-white"
-                    >
-                      <WhatsappIcon size={34} round />
-                    </a>
-                  </Link>
-                </li>
               </ul>
             </div>
             <div className="col-span-1 text-center hidden lg:block md:block">
               <p className="text-base leading-7 font-medium block">{t("common:footer-call-us")}</p>
-              <h5 className="text-2xl font-bold text-emerald-500 leading-7">+012345-67900</h5>
+              <h5 className="text-2xl font-bold text-emerald-500 leading-7">0333-333-333</h5>
             </div>
             <div className="col-span-1 hidden lg:block md:block">
               <ul className="lg:text-right">
@@ -234,10 +222,10 @@ const Footer = () => {
 
       <div className="mx-auto max-w-screen-2xl px-3 sm:px-10 flex justify-center py-4">
         <p className="text-sm text-gray-500 leading-6">
-          Copyright 2022 @{" "}
-          <Link href="https://themeforest.net/user/htmllover">
+          Copyright 2023 @{" "}
+          <Link href="https://todayfruit-store.vercel.app/">
             <a target="_blank" rel="noopener noreferrer" className="text-emerald-500">
-              HtmlLover
+              Today Fruit
             </a>
           </Link>
           , All rights reserved.
