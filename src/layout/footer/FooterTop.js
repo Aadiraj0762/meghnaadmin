@@ -31,7 +31,7 @@ const FooterTop = () => {
                     width={170}
                     height={50}
                     className="mr-2 rounded"
-                    src="/app/show-now.svg"
+                    src="/app/app-store.svg"
                     alt="app store"
                   />
                 </a>
