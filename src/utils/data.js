@@ -33,26 +33,26 @@ const pages = [
     href: '/offer',
     icon: FiGift,
   },
-  {
-    title: 'checkout-page',
-    href: '/checkout',
-    icon: IoBagCheckOutline,
-  },
+  // {
+  //   title: 'checkout-page',
+  //   href: '/checkout',
+  //   icon: IoBagCheckOutline,
+  // },
   {
     title: 'faq-page',
     href: '/faq',
     icon: FiHelpCircle,
   },
-  {
-    title: 'about-us-page',
-    href: '/about-us',
-    icon: HiOutlineUserGroup,
-  },
-  {
-    title: 'contact-us-page',
-    href: '/contact-us',
-    icon: HiOutlinePhoneIncoming,
-  },
+  // {
+  //   title: 'about-us-page',
+  //   href: '/about-us',
+  //   icon: HiOutlineUserGroup,
+  // },
+  // {
+  //   title: 'contact-us-page',
+  //   href: '/contact-us',
+  //   icon: HiOutlinePhoneIncoming,
+  // },
   {
     title: 'privacy-policy-page',
     href: '/privacy-policy',
@@ -63,11 +63,11 @@ const pages = [
     href: '/terms-and-conditions',
     icon: HiOutlineDocumentText,
   },
-  {
-    title: 'not-found-page',
-    href: '/404',
-    icon: FiAlertCircle,
-  },
+  // {
+  //   title: 'not-found-page',
+  //   href: '/404',
+  //   icon: FiAlertCircle,
+  // },
 ];
 
 const userSidebar = [
