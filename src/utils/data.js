@@ -182,7 +182,7 @@ const contactData = [
     title: 'contact-page-box2-title',
     info: 'contact-page-box2-info',
     icon: FiPhoneCall,
-    contact: '029-00124667',
+    contact: '0333-333-333',
     className: 'bg-yellow-100',
   },
   {
