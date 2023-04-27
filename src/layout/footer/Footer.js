@@ -38,16 +38,16 @@ const Footer = () => {
                 </Link>
               </li>
               <li className="flex items-baseline">
-                <Link href="#">
+                <Link href="/terms-and-conditions">
                   <a className="text-gray-600 inline-block w-full hover:text-emerald-500">
-                    {t("common:footer-careers")}
+                    {t("common:footer-terms-and-conditions")}
                   </a>
                 </Link>
               </li>
               <li className="flex items-baseline">
-                <Link href="#">
+                <Link href="/privacy-policy">
                   <a className="text-gray-600 inline-block w-full hover:text-emerald-500">
-                    {t("common:footer-news")}
+                    {t("common:footer-privacy-policy")}
                   </a>
                 </Link>
               </li>
@@ -91,7 +91,7 @@ const Footer = () => {
           </div>
           <div className="pb-3.5 sm:pb-0 col-span-1 md:col-span-2 lg:col-span-3">
             <h3 className="text-md lg:leading-7 font-medium mb-4 sm:mb-5 lg:mb-6 pb-0.5">
-              {t("common:footer-my-account-title")}
+              {t("common:footer-terms-and-policies")}
             </h3>
             <ul className="text-sm lg:text-15px flex flex-col space-y-3">
               <li className="flex items-baseline">
