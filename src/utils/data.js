@@ -28,11 +28,11 @@ const pages = [
   //   href: '/user/dashboard',
   //   icon: FiUser,
   // },
-  {
-    title: 'offer-page',
-    href: '/offer',
-    icon: FiGift,
-  },
+  // {
+  //   title: 'offer-page',
+  //   href: '/offer',
+  //   icon: FiGift,
+  // },
   // {
   //   title: 'checkout-page',
   //   href: '/checkout',

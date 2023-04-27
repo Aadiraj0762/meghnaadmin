@@ -86,7 +86,7 @@ const NavbarPromo = () => {
 
                     <Popover className="relative font-serif">
                       <Popover.Button className="group inline-flex items-center py-2 text-sm font-medium hover:text-emerald-600 focus:outline-none">
-                        <span>{t("common:More")}</span>
+                        <span>{t("More")}</span>
                         <ChevronDownIcon
                           className="ml-1 h-3 w-3 group-hover:text-emerald-600"
                           aria-hidden="true"
