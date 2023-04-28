@@ -63,7 +63,7 @@ const PrivacyPolicy = () => {
               <p>{t("common:privacy-policy-log-file-docs")}</p>
             </div>
           </div>
-          <div className="mb-8 lg:mb-12 last:mb-0">
+          {/* <div className="mb-8 lg:mb-12 last:mb-0">
             <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
               {t("common:privacy-policy-advertising")}
             </h2>
@@ -79,15 +79,15 @@ const PrivacyPolicy = () => {
               <p>{t("common:privacy-policy-third-party-docs1")}</p>
               <p>{t("common:privacy-policy-third-party-docs2")}</p>
             </div>
-          </div>
-          <div className="mb-8 lg:mb-12 last:mb-0">
+          </div> */}
+          {/* <div className="mb-8 lg:mb-12 last:mb-0">
             <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
               {t("common:privacy-policy-ccpa-rights")}
             </h2>
             <div className="font-sans leading-7">
               <p>{t("common:privacy-policy-ccpa-rights-docs")}</p>
             </div>
-          </div>
+          </div> */}
           <div className="mb-8 lg:mb-12 last:mb-0">
             <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
               {t("common:privacy-policy-children-information")}
