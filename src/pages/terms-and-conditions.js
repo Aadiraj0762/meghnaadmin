@@ -21,14 +21,14 @@ const TermAndConditions = () => {
               <p>{t("common:terms-condition-welcome-docs2")}</p>
             </div>
           </div>
-          <div className="mb-6 lg:mb-12 last:mb-0">
+          {/* <div className="mb-6 lg:mb-12 last:mb-0">
             <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
               {t("common:terms-condition-cookies")}
             </h2>
             <div className="font-sans leading-7">
               <p>{t("common:terms-condition-cookies-docs")}</p>
             </div>
-          </div>
+          </div> */}
           <div className="mb-8 lg:mb-12 last:mb-0">
             <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
               {t("common:terms-condition-license")}
@@ -77,14 +77,14 @@ const TermAndConditions = () => {
                 <p>{t("common:terms-condition-rights-docs")}</p>
               </div>
             </div>
-            <div className="my-6 lg:my-8 last:mb-0">
+            {/* <div className="my-6 lg:my-8 last:mb-0">
               <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
                 {t("common:terms-condition-website")}
               </h2>
               <div className="font-sans leading-7">
                 <p>{t("common:terms-condition-website-docs")}</p>
               </div>
-            </div>
+            </div> */}
             <div className="my-6 lg:my-8 last:mb-0">
               <h2 className="text-xl xl:text-2xl xl:leading-7 font-semibold font-serif mb-2 lg:mb-4">
                 {t("common:terms-condition-disclaimer")}
