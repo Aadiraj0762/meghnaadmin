@@ -55,7 +55,7 @@ const NavBarTop = () => {
             </span>
 
             <div className="lg:text-right flex items-center">
-              <Link href="/about-us">
+              {/* <Link href="/about-us">
                 <a className="font-medium hover:text-emerald-600">
                   {" "}
                   {t("common:About Us")}
@@ -68,7 +68,7 @@ const NavBarTop = () => {
                   {t("common:Contact Us")}
                 </a>
               </Link>
-              <span className="mx-2">|</span>
+              <span className="mx-2">|</span> */}
               <button
                 onClick={handleModal}
                 className="font-medium hover:text-emerald-600"
