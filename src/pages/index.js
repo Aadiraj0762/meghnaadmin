@@ -101,16 +101,16 @@ const Home = ({ popularProducts, discountProducts, attributes }) => {
             </div>
 
             {/* promotional banner card */}
-            <div className="block mx-auto max-w-screen-2xl">
+            {/* <div className="block mx-auto max-w-screen-2xl">
               <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
                 <div className="lg:p-16 p-6 bg-emerald-500 shadow-sm border rounded-lg">
                   <CardTwo />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* discounted products */}
-            <div
+            {/* <div
               id="discount"
               className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
             >
@@ -137,7 +137,7 @@ const Home = ({ popularProducts, discountProducts, attributes }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </Layout>
       )}
