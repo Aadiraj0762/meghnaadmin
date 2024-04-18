@@ -165,24 +165,24 @@ const Checkout = () => {
                           currency={currency}
                           handleShippingCost={handleShippingCost}
                           register={register}
-                          value="FedEx"
-                          time="Today"
+                          value="Branch"
+                          // time="Today"
                           cost={60}
                         />
                         <Error errorName={errors.shippingOption} />
-                      </div>
+                      </div> 
 
                       <div className="col-span-6 sm:col-span-3">
                         <InputShipping
                           currency={currency}
                           handleShippingCost={handleShippingCost}
                           register={register}
-                          value="UPS"
-                          time="7 Days"
+                          value="Deliver"
+                          // time="7 Days"
                           cost={20}
                         />
                         <Error errorName={errors.shippingOption} />
-                      </div>
+                      </div> *
                     </div>
                   </div>
 
@@ -208,7 +208,7 @@ const Checkout = () => {
                         <Error errorName={errors.paymentMethod} />
                       </div>
 
-                      <div className="col-span-6 sm:col-span-3">
+                       <div className="col-span-6 sm:col-span-3">
                         <InputPayment
                           setShowCard={setShowCard}
                           register={register}
@@ -217,7 +217,7 @@ const Checkout = () => {
                           Icon={ImCreditCard}
                         />
                         <Error errorName={errors.paymentMethod} />
-                      </div>
+                      </div> 
                     </div>
                   </div>
 

@@ -12,12 +12,12 @@ class MyDocument extends Document {
           <link rel="icon" href="/favicon.png" />
           <meta
             property="og:title"
-            content="Today Fruit Store"
+            content="Meghana Foods"
           />
           <meta property="og:type" content="eCommerce Website" />
           <meta
             property="og:description"
-            content="Today Fruit Store"
+            content="Meghana Foods"
           />
           <meta
             property="og:url"

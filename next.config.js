@@ -32,14 +32,11 @@ module.exports = withPWA({
       "lh3.googleusercontent.com",
       "",
       "images.dashter.com",
+      "assets.licious.in",
+      "example.com",
     ],
   },
 
   ...nextTranslate(),
 });
 
-// const withBundleAnalyzer = require('@next/bundle-analyzer')({
-//   enabled: process.env.ANALYZE === 'true',
-// });
-
-// module.exports = withBundleAnalyzer({});

@@ -245,7 +245,7 @@ const ProductScreen = ({ product, attributes, relatedProduct }) => {
                   </li>
                   <li className="text-sm pl-1 transition duration-200 ease-in cursor-pointer hover:text-emerald-500 font-semibold ">
                     <Link
-                      href={`/search?category=${category_name}&_id=${product?.category?._id}`}
+                      href={`//menu?category=${category_name}&_id=${product?.category?._id}`}
                     >
                       <button
                         type="button"
@@ -426,7 +426,7 @@ const ProductScreen = ({ product, attributes, relatedProduct }) => {
                                 {t("common:category")}:
                               </span>{" "}
                               <Link
-                                href={`/search?category=${category_name}&_id=${product?.category?._id}`}
+                                href={`//menu?category=${category_name}&_id=${product?.category?._id}`}
                               >
                                 <button
                                   type="button"

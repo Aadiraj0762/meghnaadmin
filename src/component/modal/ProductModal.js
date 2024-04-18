@@ -319,7 +319,7 @@ const ProductModal = ({
                         {t("common:category")}:
                       </span>{" "}
                       <Link
-                        href={`/search?category=${category_name}&_id=${product?.category?._id}`}
+                        href={`//menu?category=${category_name}&_id=${product?.category?._id}`}
                       >
                         <button
                           type="button"

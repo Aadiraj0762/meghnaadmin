@@ -1,4 +1,4 @@
-import { FiLock, FiMail, FiUser } from "react-icons/fi";
+import { FiLock, FiMail, FiUser,FiPhone } from "react-icons/fi";
 
 //internal import
 import Error from "@component/form/Error";
@@ -34,7 +34,17 @@ const Register = ({ setShowResetPassword, setModalOpen }) => {
 
             <Error errorName={errors.name} />
           </div>
-
+          <div className="form-group">
+            <InputArea
+              register={register}
+              label="Phone"
+              name="phone"
+              type="text"
+              placeholder="Phone"
+              Icon={FiPhone}
+            />
+            <Error errorName={errors.phone} />
+          </div>
           <div className="form-group">
             <InputArea
               register={register}
@@ -46,6 +56,7 @@ const Register = ({ setShowResetPassword, setModalOpen }) => {
             />
             <Error errorName={errors.email} />
           </div>
+
           <div className="form-group">
             <InputArea
               register={register}

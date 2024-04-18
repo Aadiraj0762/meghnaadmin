@@ -80,7 +80,7 @@ const useLoginSubmit = (setModalOpen) => {
   };
 
   const handleGoogleSignIn = (user) => {
-    // console.log("google sign in", user?.credential);
+    console.log("google sign in", user?.credential);
     const cookieTimeOut = 0.5;
 
     if (user) {

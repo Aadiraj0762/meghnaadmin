@@ -4,13 +4,13 @@ import { DefaultSeo as NextSeo } from 'next-seo';
 const DefaultSeo = () => {
   return (
     <NextSeo
-      title="Today Fruit Store"
+      title="Meghana Foods"
       openGraph={{
         type: 'website',
         locale: 'en_IE',
         url: 'https://todayfruit-store.vercel.app/',
         site_name:
-          'Today Fruit Store',
+          'Meghana Foods',
       }}
       twitter={{
         handle: '@handle',

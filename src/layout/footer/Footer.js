@@ -3,7 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import useTranslation from "next-translate/useTranslation";
-import { FacebookIcon, LinkedinIcon, PinterestIcon, TwitterIcon, WhatsappIcon } from "react-share";
+import {
+  FacebookIcon,
+  LinkedinIcon,
+  PinterestIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from "react-share";
 
 //internal import
 import { UserContext } from "@context/UserContext";
@@ -59,7 +65,7 @@ const Footer = () => {
             </h3>
             <ul className="text-sm lg:text-15px flex flex-col space-y-3">
               <li className="flex items-baseline">
-                <Link href="/search?Category=fish--meat">
+                <Link href="//menu?Category=fish--meat">
                   <a className="text-gray-600 inline-block w-full hover:text-emerald-500">
                     {t("common:footer-top-category-fish-meat")}
                   </a>
@@ -67,7 +73,7 @@ const Footer = () => {
               </li>
 
               <li className="flex items-baseline">
-                <Link href="/search?Category=drinks">
+                <Link href="//menu?Category=drinks">
                   <a className="text-gray-600 inline-block w-full hover:text-emerald-500">
                     {t("common:footer-top-category-soft-drinks")}
                   </a>
@@ -116,7 +122,9 @@ const Footer = () => {
                 </Link>
               </li>
               <li className="flex items-baseline">
-                <Link href={`${userInfo?.email ? "/user/update-profile" : "#"}`}>
+                <Link
+                  href={`${userInfo?.email ? "/user/update-profile" : "#"}`}
+                >
                   <a className="text-gray-600 inline-block w-full hover:text-emerald-500">
                     {t("common:footer-my-account-updatedProfile")}
                   </a>
@@ -127,7 +135,12 @@ const Footer = () => {
           <div className="pb-3.5 sm:pb-0 col-span-1 md:col-span-2 lg:col-span-3">
             <Link href="/">
               <a className="mr-3 lg:mr-12 xl:mr-12" rel="noreferrer">
-                <Image width={110} height={40} src="/logo/logo-color.svg" alt="logo" />
+                <Image
+                  width={110}
+                  height={40}
+                  src="/logo/logo.png"
+                  alt="logo"
+                />
               </a>
             </Link>
             <p className="leading-7 font-sans text-sm text-gray-600 mt-3">
@@ -200,8 +213,12 @@ const Footer = () => {
               </ul>
             </div>
             <div className="col-span-1 text-center hidden lg:block md:block">
-              <p className="text-base leading-7 font-medium block">{t("common:footer-call-us")}</p>
-              <h5 className="text-2xl font-bold text-emerald-500 leading-7">0333-333-333</h5>
+              <p className="text-base leading-7 font-medium block">
+                {t("common:footer-call-us")}
+              </p>
+              <h5 className="text-2xl font-bold text-emerald-500 leading-7">
+                0333-333-333
+              </h5>
             </div>
             <div className="col-span-1 hidden lg:block md:block">
               <ul className="lg:text-right">
@@ -224,8 +241,12 @@ const Footer = () => {
         <p className="text-sm text-gray-500 leading-6">
           Copyright 2023 @{" "}
           <Link href="https://todayfruit-store.vercel.app/">
-            <a target="_blank" rel="noopener noreferrer" className="text-emerald-500">
-              Today Fruit
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-emerald-500"
+            >
+              Meghana Foods{" "}
             </a>
           </Link>
           , All rights reserved.

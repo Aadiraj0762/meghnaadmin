@@ -24,7 +24,7 @@ const FeatureCategory = () => {
     const category_name = categoryName
       .toLowerCase()
       .replace(/[^A-Z0-9]+/gi, "-");
-    const url = `/search?category=${category_name}&_id=${id}`;
+    const url = `//menu?category=${category_name}&_id=${id}`;
     router.push(url);
     setIsLoading(!isLoading);
   };

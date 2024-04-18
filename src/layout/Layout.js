@@ -17,13 +17,13 @@ const Layout = ({ title, description, children }) => {
         <Head>
           <title>
             {title
-              ? `Today Fruit | ${title}`
-              : "Today Fruit Store"}
+              ? `Meghana Foods | ${title}`
+              : "Meghana Foods"}
           </title>
           {description && <meta name="description" content={description} />}
-          <link ref="icon" href="/favicon.png" />
+          <link ref="icon" href="/logo/logo.png" />
         </Head>
-        <NavBarTop />
+        {/* <NavBarTop /> */}
         <Navbar />
         <div className="bg-gray-50">{children}</div>
         <MobileFooter />

@@ -28,7 +28,7 @@ const CategoryCarousel = () => {
       ?.toLowerCase()
       .replace(/[^A-Z0-9]+/gi, "-");
 
-    router.push(`/search?category=${category_name}&_id=${id}`);
+    router.push(`//menu?category=${category_name}&_id=${id}`);
     setIsLoading(!isLoading);
   };
 

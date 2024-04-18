@@ -43,14 +43,14 @@ const Home = ({ popularProducts, discountProducts, attributes }) => {
             <div className="bg-white">
               <div className="mx-auto py-5 max-w-screen-2xl px-3 sm:px-10">
                 <div className="flex w-full">
-                  <div className="flex-shrink-0 xl:pr-6 lg:block w-full lg:w-3/5">
-                    <MainCarousel />
-                  </div>
                   <div className="w-full hidden lg:flex">
-                    <OfferCard />
+                  <OfferCard />
+                  </div>
+                  <div className="flex-shrink-0 xl:pr-6 lg:block w-full lg:w-3/5">
+                   <MainCarousel />
                   </div>
                 </div>
-                <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 hidden lg:block">
+                <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 hidden lg:block"id='seeallbanner'>
                   <Banner />
                 </div>
               </div>
@@ -78,11 +78,12 @@ const Home = ({ popularProducts, discountProducts, attributes }) => {
               <div className="mb-10 flex justify-center">
                 <div className="text-center w-full lg:w-2/5">
                   <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                    {t("common:popular-products-title")}
+                    {/* {t("common:popular-products-title")} */}
+                    Meghana's Menu
                   </h2>
-                  <p className="text-base font-sans text-gray-600 leading-6">
+                  {/* <p className="text-base font-sans text-gray-600 leading-6">
                     {t("common:popular-products-sub-title")}
-                  </p>
+                  </p> */}
                 </div>
               </div>
               <div className="flex">
@@ -175,3 +176,8 @@ export const getServerSideProps = async (context) => {
 };
 
 export default Home;
+
+
+
+
+

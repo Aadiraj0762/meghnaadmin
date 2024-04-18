@@ -180,52 +180,7 @@ const useCheckoutSubmit = () => {
   };
 
   const handlePaymentWithStripe = async (order) => {
-    try {
-      // console.log('try goes here!', order);
-      // const updatedOrder = {
-      //   ...order,
-      //   currency: 'usd',
-      // };
-      OrderServices.createPaymentIntent(order)
-        .then((res) => {
-          stripe.confirmCardPayment(res.client_secret, {
-            payment_method: {
-              card: elements.getElement(CardElement),
-            },
-          });
-
-          const orderData = {
-            ...order,
-            cardInfo: res,
-          };
-          OrderServices.addOrder(orderData)
-            .then((res) => {
-              router.push(`/order/${res._id}`);
-              notifySuccess("Your Order Confirmed!");
-              Cookies.remove("couponInfo");
-              emptyCart();
-              sessionStorage.removeItem("products");
-              setIsCheckoutSubmit(false);
-            })
-            .catch((err) => {
-              notifyError(err ? err?.response?.data?.message : err.message);
-              setIsCheckoutSubmit(false);
-            });
-          // console.log('res', res, 'paymentIntent', paymentIntent);
-        })
-
-        .catch((err) => {
-          console.log("err on creating payment intent", err.message);
-          notifyError(err ? err?.response?.data?.message : err.message);
-          setIsCheckoutSubmit(false);
-        });
-    } catch (err) {
-      console.log("err", err?.message);
-      notifyError(err ? err?.response?.data?.message : err.message);
-      setIsCheckoutSubmit(false);
-    }
   };
-
   const handleShippingCost = (value) => {
     setShippingCost(value);
   };
