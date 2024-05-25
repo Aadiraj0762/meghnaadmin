@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useEffect } from "react";
 import Image from "next/image";
 import useTranslation from "next-translate/useTranslation";
 import Link from "next/link";
@@ -7,14 +7,13 @@ import { FaUtensils } from "react-icons/fa";
 //internal import
 import Layout from "@layout/Layout";
 import PageHeader from "@component/header/PageHeader";
+import FullTestimonial from "@layout/FullTestimonial";
 
 const AboutUs = () => {
   const { t } = useTranslation();
-
   return (
     <Layout title="About Us" description="This is about us page">
       <PageHeader title="about-page-title" />
-
       <div className="bg-white">
         <div className="max-w-screen-2xl mx-auto lg:py-20 py-10 px-4 sm:px-10">
           <div className="grid grid-flow-row lg:grid-cols-2 gap-4 lg:gap-16 items-center">
@@ -66,7 +65,12 @@ const AboutUs = () => {
               </div>
             </div>
             <div className="mt-10 lg:mt-0">
-              <Image width={920} height={750} src="/about-us.jpg" alt="logo" />
+              <Image
+                width={920}
+                height={750}
+                src="https://res.cloudinary.com/djqex7eae/image/upload/v1713427026/wikmm8ojs65kzpzegc7e.png"
+                alt="logo"
+              />
             </div>
           </div>
           {/* <div className="mt-10 lg:mt-16 text-base opacity-90 leading-7">
@@ -80,16 +84,26 @@ const AboutUs = () => {
               <button
                 data-variant="flat"
                 className="md:text-sm leading-4 inline-flex items-center cursor-pointer transition ease-in-out duration-300 font-semibold text-center justify-center border-0 border-transparent rounded-md placeholder-white focus-visible:outline-none focus:outline-none bg-emerald-500 text-white px-5 md:px-6 lg:px-8 py-3 md:py-3.5 lg:py-3 hover:text-white hover:bg-emerald-600 h-12 mt-1 text-sm lg:text-base w-full sm:w-auto"
-              style={{backgroundColor:"#fe0000",width:"47%",padding:"25px",marginTop:"20px"}}
+                style={{
+                  backgroundColor: "#fe0000",
+                  width: "47%",
+                  padding: "25px",
+                  marginTop: "20px",
+                }}
               >
-                <FaUtensils />&nbsp;&nbsp;
+                <FaUtensils />
+                &nbsp;&nbsp;
                 {t("Explore Menu")}
               </button>
             </Link>
           </div>
         </div>
-        
-        <div className="bg-gray-50 lg:py-20 py-10">
+
+        <div
+          className="bg-gray-50 lg:py-20 py-10"
+          id="process"
+          style={{ height: "500px" }}
+        >
           <div className="max-w-screen-2xl mx-auto px-3 sm:px-10">
             <div className="relative flex flex-col sm:flex-row sm:items-end justify-between mb-8">
               <div className="max-w-2xl">
@@ -99,11 +113,14 @@ const AboutUs = () => {
                 <p className="mt-2 md:mt-3 font-normal block text-base">
                   {/* {t("common:about-our-founder-paragraph")} */}
                 </p>
-                
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div id="testimonial">
+        <FullTestimonial />
+       
       </div>
     </Layout>
   );

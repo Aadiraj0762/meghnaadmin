@@ -21,7 +21,7 @@ const Footer = () => {
   } = useContext(UserContext);
 
   return (
-    <div className="pb-16 lg:pb-0 xl:pb-0 bg-white">
+    <div className="pb-16 lg:pb-0 xl:pb-0"id="footerstyle">
       <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
         <div className="grid grid-cols-2 md:grid-cols-7 xl:grid-cols-12 gap-5 sm:gap-9 lg:gap-11 xl:gap-7 py-10 lg:py-16 justify-between">
           <div className="pb-3.5 sm:pb-0 col-span-1 md:col-span-2 lg:col-span-3">
@@ -153,16 +153,16 @@ const Footer = () => {
           </div>
         </div>
 
-        <hr className="hr-line"></hr>
+        {/* <hr className="hr-line"></hr> */}
 
-        <div className="mx-auto max-w-screen-2xl px-4 sm:px-10 bg-gray-50 shadow-sm border border-gray-50 rounded-lg">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-9 lg:gap-11 xl:gap-7 py-8 items-center justify-between">
             <div className="col-span-1">
               <span className="text-base leading-7 font-medium block mb-2 pb-0.5">
                 {t("common:footer-follow-us")}
               </span>
               <ul className="text-sm flex">
-                {/* <li className="flex items-center mr-3 transition ease-in-out duration-500">
+                <li className="flex items-center mr-3 transition ease-in-out duration-500">
                   <Link href="https://www.facebook.com">
                     <a
                       aria-label="Social Link"
@@ -197,7 +197,7 @@ const Footer = () => {
                       <PinterestIcon size={34} round />
                     </a>
                   </Link>
-                </li> */}
+                </li>
                 <li className="flex items-center  mr-3 transition ease-in-out duration-500">
                   <Link href="https://www.linkedin.com/in/tranhongtri/">
                     <a
@@ -257,3 +257,4 @@ const Footer = () => {
 };
 
 export default dynamic(() => Promise.resolve(Footer), { ssr: false });
+

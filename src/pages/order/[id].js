@@ -41,7 +41,7 @@ const Order = ({ params }) => {
       }
     })();
 
-    if (!userInfo) {
+    if (userInfo) {
       router.push("/");
     }
   }, []);

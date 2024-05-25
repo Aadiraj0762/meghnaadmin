@@ -9,6 +9,8 @@ import {
   IoWalletSharp,
 } from "react-icons/io5";
 import { ImCreditCard } from "react-icons/im";
+import { useContext, useEffect, useRef, useState } from "react";
+import { GoogleMap, LoadScript, Autocomplete, Marker } from "@react-google-maps/api";
 
 //internal import
 import Layout from "@layout/Layout";
@@ -16,11 +18,13 @@ import Label from "@component/form/Label";
 import Error from "@component/form/Error";
 import CartItem from "@component/cart/CartItem";
 import InputArea from "@component/form/InputArea";
-import InputShipping from "@component/form/InputShipping";
+// import InputShipping from "@component/form/InputShipping";
 import InputPayment from "@component/form/InputPayment";
 import useCheckoutSubmit from "@hooks/useCheckoutSubmit";
 import useTranslation from "next-translate/useTranslation";
-
+import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import LocationSelector from "../component/form/LocationSelector"
 const Checkout = () => {
   const {
     handleSubmit,
@@ -43,10 +47,416 @@ const Checkout = () => {
     cartTotal,
     currency,
     isCheckoutSubmit,
+    shippingOption,
   } = useCheckoutSubmit();
+  const [selectedOption, setSelectedOption] = useState({
+    value: 'Deliver',
+    label: 'Delivery Selected',
+  });
 
+  const handleShippingOptionChange = (event) => {
+    const { value } = event.target;
+    setSelectedOption({
+      value,
+      // label: value === 'Pickup' ? 'Pickup Selected' : 'Delivery Selected',
+    });
+    console.log(value);
+  };
+  
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
+
+  const [store, setStore]=useState(null);
   const { t } = useTranslation();
+  const [currentLocation, setCurrentLocation] = useState({
+    addressLine: "",
+    city: "",
+    country: "",
+    zipCode: "",
+  });
 
+  // rest of the component code  const [storeData, setStoreData] = useState([]);
+  const [locationType, setLocationType] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
+  useEffect(() => {
+    // Fetch store data
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5055/api/store");
+        const data = await response.json();
+        setStoreData(data);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleLocationTypeChange = (e) => {
+    setLocationType(e.target.value);
+    if (e.target.value === "Deliver") {
+      checkStoreAvailability();
+    }
+  };
+  
+  const checkStoreAvailability = () => {
+    const currentTime = new Date();
+    const currentHours = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+
+    const openStores = storeData.filter((store) => {
+      const storeOpenTime = new Date(currentTime);
+      storeOpenTime.setHours(parseInt(store.storeOpenTime));
+      storeOpenTime.setMinutes(11); // Assuming opening time always has 11 minutes
+
+      const storeCloseTime = new Date(currentTime);
+      storeCloseTime.setHours(parseInt(store.storeCloseTime));
+      storeCloseTime.setMinutes(6); // Assuming closing time always has 6 minutes
+
+      return (
+        (storeOpenTime <= currentTime && currentTime <= storeCloseTime) ||
+        (storeOpenTime <= currentTime &&
+          currentTime <=
+            storeCloseTime.setMinutes(storeCloseTime.getMinutes() + 30))
+      );
+    });
+
+    if (openStores.length > 0) {
+      setAlertMessage(
+        `Order will be prepared soon at ${openStores
+          .map((store) => store.storeName)
+          .join(", ")}!`
+      );
+    } else {
+      setAlertMessage("No store available for delivery!");
+    }
+  };
+  const loadScript = (url) => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = url;
+      script.async = true;
+      script.defer = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  };
+  
+  useEffect(() => {
+    const initializeMap = () => {
+      const mapInstance = new google.maps.Map(document.getElementById("map-container"), {
+        center: { lat: 20.5937, lng: 78.9629 }, // India coordinates
+        zoom: 5,
+      });
+
+      const geocoder = new google.maps.Geocoder();
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Search location...";
+      const searchBox = new google.maps.places.SearchBox(input);
+      mapInstance.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+      const initialMarker = new google.maps.Marker({
+        position: { lat: 20.5937, lng: 78.9629 },
+        map: mapInstance,
+        draggable: true,
+      });
+
+      initialMarker.addListener("dragend", () => {
+        const position = initialMarker.getPosition();
+        updateLocationDetails(position.lat(), position.lng());
+      });
+
+      setMarker(initialMarker);
+
+      mapInstance.addListener("bounds_changed", () => {
+        searchBox.setBounds(mapInstance.getBounds());
+      });
+
+      searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+        if (places.length === 0) {
+          return;
+        }
+
+        const bounds = new google.maps.LatLngBounds();
+        places.forEach((place) => {
+          if (!place.geometry || !place.geometry.location) {
+            return;
+          }
+
+          if (place.geometry.viewport) {
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+
+          initialMarker.setPosition(place.geometry.location);
+          updateLocationDetails(place.geometry.location.lat(), place.geometry.location.lng());
+        });
+
+        mapInstance.fitBounds(bounds);
+      });
+
+      setMap(mapInstance);
+    };
+
+    const updateLocationDetails = (lat, lng) => {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          const addressComponents = results[0].address_components;
+          const addressDetails = {
+            addressLine: results[0].formatted_address,
+            city: "",
+            state: "",
+            pincode: "",
+          };
+
+          addressComponents.forEach((component) => {
+            const types = component.types;
+            if (types.includes("locality")) {
+              addressDetails.city = component.long_name;
+            }
+            if (types.includes("administrative_area_level_1")) {
+              addressDetails.state = component.long_name;
+            }
+            if (types.includes("postal_code")) {
+              addressDetails.pincode = component.long_name;
+            }
+          });
+
+          document.getElementById("address-line").value = addressDetails.addressLine || "";
+          document.getElementById("city").value = addressDetails.city || "";
+          document.getElementById("state").value = addressDetails.state || "";
+          document.getElementById("pincode").value = addressDetails.pincode || "";
+
+          fetch("http://127.0.0.1:5055/api/store")
+            .then((response) => response.json())
+            .then((stores) => {
+              const nearbyStores = stores.filter((store) => {
+                const storeLocation = {
+                  latitude: parseFloat(store.latitude),
+                  longitude: parseFloat(store.longitude),
+                };
+
+                const distance = calculateDistance({ latitude: lat, longitude: lng }, storeLocation);
+                return distance <= 6;
+              });
+
+              console.log("Nearby Stores:", nearbyStores);
+              const storeNames = nearbyStores.map((store) => store.storeName);
+            })
+            .catch((error) => {
+              console.error("Error fetching store data:", error);
+            });
+        }
+      });
+    };
+
+    function calculateDistance(location1, location2) {
+      const earthRadius = 6371;
+      const latDiff = deg2rad(location2.latitude - location1.latitude);
+      const lngDiff = deg2rad(location2.longitude - location1.longitude);
+      const a =
+        Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+        Math.cos(deg2rad(location1.latitude)) *
+          Math.cos(deg2rad(location2.latitude)) *
+          Math.sin(lngDiff / 2) *
+          Math.sin(lngDiff / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return earthRadius * c;
+    }
+
+    function deg2rad(deg) {
+      return deg * (Math.PI / 180);
+    }
+
+    loadScript(`https://maps.googleapis.com/maps/api/js?key=AIzaSyBbfnvObzwcs6OLXOmSaG9CtIhwjmBwLTQ&libraries=places`)
+      .then(() => {
+        initializeMap();
+      })
+      .catch((error) => {
+        console.error("Error loading Google Maps script:", error);
+      });
+
+    return () => {
+      if (map) {
+        // No need to remove the map as Google Maps API doesn't support it
+      }
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   mapboxgl.accessToken =
+  //     "pk.eyJ1IjoiYWFkaTc2MiIsImEiOiJjbHZtMWM2aW0ybWFkMnZuMXg5YXR3djljIn0.vUj8hLhZWeAYIB07k9KMyA";
+  //   const initializeMap = () => {
+  //     const mapInstance = new mapboxgl.Map({
+  //       container: "map-container",
+  //       style: "mapbox://styles/mapbox/streets-v11",
+  //       center: [78.9629, 20.5937], // India coordinates
+  //       zoom: 5,
+  //     });
+
+  //     mapInstance.addControl(
+  //       new MapboxGeocoder({
+  //         accessToken: mapboxgl.accessToken,
+  //         mapboxgl: mapboxgl,
+  //         countries: "IN",
+  //       })
+  //     );
+
+  //     mapInstance.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+
+  //     mapInstance.addControl(
+  //       new mapboxgl.GeolocateControl({
+  //         positionOptions: {
+  //           enableHighAccuracy: true,
+  //         },
+  //         trackUserLocation: true,
+  //       })
+  //     );
+
+  //     mapInstance.on("moveend", () => {
+  //       const { lng, lat } = mapInstance.getCenter();
+  //       fetch(
+  //         `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
+  //       )
+  //         .then((response) => response.json())
+  //         .then((data) => {
+  //           const userLatitude = lat;
+  //           const userLongitude = lng;
+  //           const userLocation = {
+  //             latitude: userLatitude,
+  //             longitude: userLongitude,
+  //           };
+
+  //           // Log entire data including latitude and longitude
+  //           console.log("Geocoding data:", data);
+
+  //           // Process address details
+  //           const addressComponents = data.features[0].context || [];
+  //           const addressDetails = {
+  //             addressLine: "",
+  //             city: "",
+  //             state: "",
+  //             pincode: "",
+  //           };
+  //           addressComponents.forEach((component) => {
+  //             switch (component.id.split(".")[0]) {
+  //               case "place":
+  //                 addressDetails.city = component.text;
+  //                 break;
+  //               case "region":
+  //                 addressDetails.state = component.text;
+  //                 break;
+  //               case "postcode":
+  //                 addressDetails.pincode = component.text;
+  //                 break;
+  //             }
+  //           });
+  //           addressDetails.addressLine = data.features[0].place_name
+  //             .split(",")
+  //             .slice(0, -3)
+  //             .join(",");
+  //           document.getElementById("address-line").value =
+  //             addressDetails.addressLine || "";
+  //           document.getElementById("city").value = addressDetails.city || "";
+  //           document.getElementById("state").value = addressDetails.state || "";
+  //           document.getElementById("pincode").value =
+  //             addressDetails.pincode || "";
+
+  //           // Fetch store data
+  //           fetch("http://127.0.0.1:5055/api/store")
+  //             .then((response) => response.json())
+  //             .then((stores) => {
+  //               // Filter stores within 6km
+  //               const nearbyStores = stores.filter((store) => {
+  //                 const storeLocation = {
+  //                   latitude: parseFloat(store.latitude),
+  //                   longitude: parseFloat(store.longitude),
+  //                 };
+
+  //                 // Calculate distance between user and store
+  //                 const distance = calculateDistance(
+  //                   userLocation,
+  //                   storeLocation
+  //                 );
+
+  //                 // Filter stores within 6km
+  //                 return distance <= 6;
+  //               });
+
+  //               // Log nearby stores
+  //               console.log("Nearby Stores:", nearbyStores);
+
+  //               // Alert store names
+  //               const storeNames = nearbyStores.map((store) => store.storeName);
+  //               // alert(`Nearby stores within 6km: ${storeNames.join(", ")}`);
+  //             })
+  //             .catch((error) => {
+  //               console.error("Error fetching store data:", error);
+  //             });
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error fetching geocoding data:", error);
+  //         });
+  //     });
+
+  //     // Function to calculate distance between two locations (in km)
+  //     function calculateDistance(location1, location2) {
+  //       const earthRadius = 6371; // Radius of the Earth in km
+  //       const latDiff = deg2rad(location2.latitude - location1.latitude);
+  //       const lngDiff = deg2rad(location2.longitude - location1.longitude);
+  //       const a =
+  //         Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+  //         Math.cos(deg2rad(location1.latitude)) *
+  //           Math.cos(deg2rad(location2.latitude)) *
+  //           Math.sin(lngDiff / 2) *
+  //           Math.sin(lngDiff / 2);
+  //       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  //       const distance = earthRadius * c;
+  //       return distance;
+  //     }
+
+  //     // Function to convert degrees to radians
+  //     function deg2rad(deg) {
+  //       return deg * (Math.PI / 180);
+  //     }
+
+  //     setMap(mapInstance);
+  //   };
+
+  //   if (!map) {
+  //     initializeMap();
+  //   }
+
+  //   return () => {
+  //     if (map) {
+  //       map.remove();
+  //     }
+  //   };
+  // }, [map]);
+  const [storeData, setStoreData] = useState([]);
+
+  useEffect(() => {
+    // Fetch store data
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5055/api/store");
+        const data = await response.json();
+        setStoreData(data);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <>
       <Layout title="Checkout" description="this is checkout page">
@@ -54,7 +464,11 @@ const Checkout = () => {
           <div className="py-10 lg:py-12 px-0 2xl:max-w-screen-2xl w-full xl:max-w-screen-xl flex flex-col md:flex-row lg:flex-row">
             <div className="md:w-full lg:w-3/5 flex h-full flex-col order-2 sm:order-1 lg:order-1">
               <div className="mt-5 md:mt-0 md:col-span-2">
-                <form onSubmit={handleSubmit(submitHandler)}>
+                <form
+                  onSubmit={handleSubmit((data) =>
+                    submitHandler(data, selectedOption)
+                  )}
+                >
                   <div className="form-group">
                     <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
                       01. {t("common:personalDetails")}
@@ -106,89 +520,139 @@ const Checkout = () => {
                       </div>
                     </div>
                   </div>
-
                   <div className="form-group mt-12">
-                    <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
-                      02. {t("common:shippingDetails")}
-                    </h2>
-
-                    <div className="grid grid-cols-6 gap-6 mb-8">
-                      <div className="col-span-6">
-                        <InputArea
-                          register={register}
-                          label={t("common:streetAddress")}
-                          name="address"
-                          type="text"
-                          placeholder="123 Boulevard Rd, Beverley Hills"
-                        />
-                        <Error errorName={errors.address} />
-                      </div>
-
-                      <div className="col-span-6 sm:col-span-6 lg:col-span-2">
-                        <InputArea
-                          register={register}
-                          label={t("common:city")}
-                          name="city"
-                          type="text"
-                          placeholder="Los Angeles"
-                        />
-                        <Error errorName={errors.city} />
-                      </div>
-
-                      <div className="col-span-6 sm:col-span-3 lg:col-span-2">
-                        <InputArea
-                          register={register}
-                          label="Country"
-                          name="country"
-                          type="text"
-                          placeholder="United States"
-                        />
-                        <Error errorName={errors.country} />
-                      </div>
-
-                      <div className="col-span-6 sm:col-span-3 lg:col-span-2">
-                        <InputArea
-                          register={register}
-                          label={t("common:zIPPostal")}
-                          name="zipCode"
-                          type="text"
-                          placeholder="2345"
-                        />
-                        <Error errorName={errors.zipCode} />
-                      </div>
-                    </div>
-
-                    <Label label="Shipping Cost" />
-                    <div className="grid grid-cols-6 gap-6">
-                      <div className="col-span-6 sm:col-span-3">
-                        <InputShipping
-                          currency={currency}
-                          handleShippingCost={handleShippingCost}
-                          register={register}
-                          value="Branch"
-                          // time="Today"
-                          cost={60}
-                        />
-                        <Error errorName={errors.shippingOption} />
-                      </div> 
-
-                      <div className="col-span-6 sm:col-span-3">
-                        <InputShipping
-                          currency={currency}
-                          handleShippingCost={handleShippingCost}
-                          register={register}
-                          value="Deliver"
-                          // time="7 Days"
-                          cost={20}
-                        />
-                        <Error errorName={errors.shippingOption} />
-                      </div> *
-                    </div>
+                    {/* <LocationSelector/> */}
+        <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
+          02. {t("Service Mode Type")}
+        </h2>
+        <div className="grid grid-cols-6 gap-6">
+          <div className="col-span-6 sm:col-span-3">
+            <div className="px-3 py-4 card border border-gray-200 bg-white rounded-md">
+              <label className="cursor-pointer label">
+                <div className="flex item-center justify-between">
+                  <div className="flex items-center">
+                    <h6 className="font-serif font-medium text-sm text-gray-600">
+                      Delivery
+                    </h6>
                   </div>
+                  <input
+                    name="shippingOption"
+                    type="radio"
+                    className="form-radio outline-none focus:ring-0 text-emerald-500"
+                    value="Deliver"
+                    checked={selectedOption.value === "Deliver"}
+                    onChange={handleShippingOptionChange}
+                  />
+                </div>
+              </label>
+            </div>
+          </div>
+          <div className="col-span-6 sm:col-span-3">
+            <div className="px-3 py-4 card border border-gray-200 bg-white rounded-md">
+              <label className="cursor-pointer label">
+                <div className="flex item-center justify-between">
+                  <div className="flex items-center">
+                    <h6 className="font-serif font-medium text-sm text-gray-600">
+                      Pickup
+                    </h6>
+                  </div>
+                  <input
+                    name="shippingOption"
+                    type="radio"
+                    className="form-radio outline-none focus:ring-0 text-emerald-500"
+                    value="Pickup"
+                    checked={selectedOption.value === "Pickup"}
+                    onChange={handleShippingOptionChange}
+                  />
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        {selectedOption.value === "Pickup" && (
+        <li style={{listStyle:"none"}}>
+          <label>
+            <select onChange={(e) => (e.target.value)}>
+              <option value="">Select location</option>
+              {storeData.map((store) => (
+                <option key={store._id} value={store._id}>
+                  {store.storeName} - {store.addressLine}, {store.city}
+                </option>
+              ))}
+            </select>
+            
+          </label>
+        </li>
+      )}
+        {selectedOption.label && <div>{selectedOption.label}</div>}
+      </div>
+      {selectedOption.value !== "Pickup" && (
+        <div id="location-address" className="form-group mt-12">
+          <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
+            03. {t("Addresss Details")}
+          </h2>
+          <div className="grid grid-cols-6 gap-6 mb-8">
+            <div className="col-span-6">
+              <input
+                register={register}
+                label={t("common:streetAddress")}
+                name="user_info.address"
+                id="address-line"
+                type="text"
+                placeholder="123 Boulevard Rd, Beverley Hills"
+                className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                defaultValue={currentLocation?.addressLine || ""}
+              />
+              <Error errorName={errors.address} />
+            </div>
+            <div className="col-span-6 sm:col-span-6 lg:col-span-2">
+              <input
+                register={register}
+                label={t("common:city")}
+                name="user_info.city"
+                id="city"
+                type="text"
+                placeholder="Los Angeles"
+                className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                defaultValue={currentLocation?.city || ""}
+              />
+              <Error errorName={errors.city} />
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+              <input
+                register={register}
+                label="Country"
+                name="country"
+                id="state"
+                type="text"
+                placeholder="United States"
+                className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                defaultValue={currentLocation?.country || ""}
+              />
+              <Error errorName={errors.country} />
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+              <input
+                register={register}
+                label={t("common:zIPPostal")}
+                name="zipCode"
+                id="pincode"
+                type="text"
+                placeholder="2345"
+                className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                defaultValue={currentLocation?.zipCode || ""}
+              />
+              <Error errorName={errors.zipCode} />
+            </div>
+          </div>
+          <div id="map-container" className="h-96" />
+          <br />
+        </div>
+      )}
 
                   <div className="form-group mt-12">
                     <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
-                      03. {t("common:paymentDetails")}
+                      04. {t("common:paymentDetails")}
                     </h2>
                     {showCard && (
                       <div className="mb-3">
@@ -208,7 +672,7 @@ const Checkout = () => {
                         <Error errorName={errors.paymentMethod} />
                       </div>
 
-                       <div className="col-span-6 sm:col-span-3">
+                      <div className="col-span-6 sm:col-span-3">
                         <InputPayment
                           setShowCard={setShowCard}
                           register={register}
@@ -217,7 +681,7 @@ const Checkout = () => {
                           Icon={ImCreditCard}
                         />
                         <Error errorName={errors.paymentMethod} />
-                      </div> 
+                      </div>
                     </div>
                   </div>
 

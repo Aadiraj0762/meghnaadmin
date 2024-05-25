@@ -92,7 +92,7 @@ const useCheckoutSubmit = () => {
 
   //if not login then push user to home page
   useEffect(() => {
-    if (!userInfo) {
+    if (userInfo) {
       router.push("/");
     }
 
@@ -105,82 +105,60 @@ const useCheckoutSubmit = () => {
     setValue("country", shippingAddress.country);
     setValue("zipCode", shippingAddress.zipCode);
   }, []);
-
-  const submitHandler = async (data) => {
+  const submitHandler = async (data, shippingOption) => {
+    // Save shipping address to Redux state
     dispatch({ type: "SAVE_SHIPPING_ADDRESS", payload: data });
+
+    // Save shipping address to cookies
     Cookies.set("shippingAddress", JSON.stringify(data));
-    setIsCheckoutSubmit(true);
-    setError("");
 
-    userInfo = {
-      name: `${data.firstName} ${data.lastName}`,
-      contact: data.contact,
-      email: data.email,
-      address: data.address,
-      country: data.country,
-      city: data.city,
-      zipCode: data.zipCode,
-    };
+   
+  // Prepare user info object
+  const userInfo = {
+    name: `${data.firstName} ${data.lastName}`,
+    contact: data.contact,
+    email: data.email,
+    address: data.address,
+    city: data.city,
+    country: data.country,
+    zipCode: data.zipCode,
+  };
 
-    let orderInfo = {
-      user_info: userInfo,
-      shippingOption: data.shippingOption,
-      paymentMethod: data.paymentMethod,
-      status: "Pending",
-      cart: items,
-      subTotal: cartTotal,
-      shippingCost: shippingCost,
-      discount: discountAmount,
-      total: total,
-    };
+  // Construct orderInfo object
+  const orderInfo = {
+    user_info: userInfo,
+    paymentMethod: data.paymentMethod,
+    status: "Pending",
+    cart: items,
+    subTotal: cartTotal,
+    shippingCost: shippingCost,
+    discount: discountAmount,
+    total: total,
+    shippingOption: shippingOption.value, // use shippingOption parameter instead of data.shippingOption
+  };
 
+
+    // Handle payment based on payment method
     if (data.paymentMethod === "Card") {
-      if (!stripe || !elements) {
-        return;
-      }
-
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: "card",
-        card: elements.getElement(CardElement),
-      });
-
-      // console.log('error', error);
-
-      if (error && !paymentMethod) {
-        setError(error.message);
-        setIsCheckoutSubmit(false);
-      } else {
-        setError("");
-        const orderData = {
-          ...orderInfo,
-          cardInfo: paymentMethod,
-        };
-
-        handlePaymentWithStripe(orderData);
-
-        // console.log('cardInfo', orderData);
-        return;
-      }
-    }
-    if (data.paymentMethod === "Cash") {
+      // Payment logic with Stripe
+    } else if (data.paymentMethod === "Cash") {
+      // Submit order with shipping option
       OrderServices.addOrder(orderInfo)
         .then((res) => {
           router.push(`/order/${res._id}`);
           notifySuccess("Your Order Confirmed!");
+          // Clear cookies and session storage
           Cookies.remove("couponInfo");
           sessionStorage.removeItem("products");
           emptyCart();
-          setIsCheckoutSubmit(false);
         })
         .catch((err) => {
           notifyError(err.message);
-          setIsCheckoutSubmit(false);
         });
     }
   };
 
-  const handlePaymentWithStripe = async (order) => {
-  };
+  const handlePaymentWithStripe = async (order) => {};
   const handleShippingCost = (value) => {
     setShippingCost(value);
   };

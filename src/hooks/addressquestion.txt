@@ -1,0 +1,981 @@
+  const submitHandler = async (data, shippingOption) => {
+    dispatch({ type: "SAVE_SHIPPING_ADDRESS", payload: data });
+    Cookies.set("shippingAddress", JSON.stringify(data));
+    setIsCheckoutSubmit(true);
+    setError("");
+
+    userInfo = {
+      name: `${data.firstName} ${data.lastName}`,
+      contact: data.contact,
+      email: data.email,
+      address: data.user_info?.address || "",
+      city: data.user_info?.city || "",
+      country: data.user_info?.country || "",
+      zipCode: data.user_info?.zipCode || "",
+      shippingOption: shippingOption,
+    };
+
+    // Construct orderInfo object
+
+    let orderInfo = {
+      user_info: userInfo,
+      paymentMethod: data.paymentMethod,
+      status: "Pending",
+      cart: items,
+      subTotal: cartTotal,
+      shippingCost: shippingCost,
+      discount: discountAmount,
+      total: total,
+      address: data.address, // Include the address field from the form data
+      city: data.city, // Include the city field from the form data
+      country: data.country, // Include the country field from the form data
+      zipCode: data.zipCode, // Include the zipCode field from the form data      shippingOption: shippingOption, // add the shippingOption field to the orderInfo object
+    };
+
+    if (data.paymentMethod === "Card") {
+      if (!stripe || !elements) {
+        return;
+      }
+
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card: elements.getElement(CardElement),
+      });
+
+      if (error && !paymentMethod) {
+        setError(error.message);
+        setIsCheckoutSubmit(false);
+      } else {
+        setError("");
+        const orderData = {
+          ...orderInfo,
+          cardInfo: paymentMethod,
+        };
+
+        handlePaymentWithStripe(orderData);
+
+        return;
+      }
+    }
+    if (data.paymentMethod === "Cash") {
+      OrderServices.addOrder(orderInfo) // pass the orderInfo object with the shippingOption field
+        .then((res) => {
+          router.push(`/order/${res._id}`);
+          notifySuccess("Your Order Confirmed!");
+          Cookies.remove("couponInfo");
+          sessionStorage.removeItem("products");
+          emptyCart();
+          setIsCheckoutSubmit(false);
+        })
+        .catch((err) => {
+          notifyError(err.message);
+          setIsCheckoutSubmit(false);
+        });
+    }
+  };
+
+                  <div id="location-address" className="form-group mt-12">
+                    <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
+                      03. {t("Addresss Details")}
+                    </h2>
+
+                    <div className="grid grid-cols-6 gap-6 mb-8">
+                      <div className="col-span-6">
+                        <input
+                          register={register}
+                          label={t("common:streetAddress")}
+                          name="user_info.address"
+                          id="address-line"
+                          type="text"
+                          placeholder="123 Boulevard Rd, Beverley Hills"
+                          className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                          defaultValue={currentLocation?.addressLine || ""}
+
+                        />
+                        <Error errorName={errors.address} />
+                      </div>
+
+                      <div className="col-span-6 sm:col-span-6 lg:col-span-2">
+                        <input
+                          register={register}
+                          label={t("common:city")}
+                          name="user_info.city"
+                          id="city"
+                          type="text"
+                          placeholder="Los Angeles"
+                          className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                          defaultValue={currentLocation?.city || ""}
+
+                        />
+                        <Error errorName={errors.city} />
+                      </div>
+
+                      <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+                        <input
+                          register={register}
+                          label="Country"
+                          name="country"
+                          id="state"
+                          type="text"
+                          placeholder="United States"
+                          className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                          defaultValue={currentLocation?.country || ""}
+
+                        />
+                        <Error errorName={errors.country} />
+                      </div>
+
+                      <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+                        <input
+                          register={register}
+                          label={t("common:zIPPostal")}
+                          name="zipCode"
+                          id="pincode"
+                          type="text"
+                          placeholder="2345"
+                          className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+                          defaultValue={currentLocation?.zipCode || ""}
+
+                        />
+                        <Error errorName={errors.zipCode} />
+                      </div>
+                    </div>
+
+                    <div id="map-container" className="h-96" />
+                    <br />
+                  </div>
+by analyzing give me the final solution i want now the final and full proper solution now use the solution who will not submit the empty address  i again repeat i need final solution and make sure this solution should be work for reference giving u the model, backend whats structure required that
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
+
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    invoice: {
+      type: Number,
+      required: false,
+    },
+    cart: [{}],
+    user_info: {
+      name: {
+        type: String,
+        required: false,
+      },
+      email: {
+        type: String,
+        required: false,
+      },
+      contact: {
+        type: String,
+        required: false,
+      },
+      address: {
+        type: String,
+        required: false,
+      },
+      city: {
+        type: String,
+        required: false,
+      },
+      country: {
+        type: String,
+        required: false,
+      },
+      zipCode: {
+        type: String,
+        required: false,
+      },
+    },
+    subTotal: {
+      type: Number,
+      required: true,
+    },
+    shippingCost: {
+      type: Number,
+      required: true,
+    },
+    discount: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    total: {
+      type: Number,
+      required: true,
+    },
+    shippingOption: {
+      type: String,
+      enum: ["Pickup", "Deliver"],
+      required: true,
+    },
+    paymentMethod: {
+      type: String,
+      required: true,
+    },
+    cardInfo: {
+      type: Object,
+      required: false,
+    },
+    status: {
+      type: String,
+      enum: ["Pending", "Processing", "Delivered", "Cancel"],
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Order = mongoose.model(
+  "Order",
+  orderSchema.plugin(AutoIncrement, {
+    inc_field: "invoice",
+    start_seq: 10000,
+  })
+);
+
+module. Exports = Order;
+
+
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useCookies } from "react-cookie";
+
+const CheckoutForm = ({ userInfo, shippingAddress }) => {
+  const router = useRouter();
+  const [cookies, setCookie] = useCookies(["shippingAddress"]);
+
+  useEffect(() => {
+    if (userInfo) {
+      router.push("/");
+    }
+  }, []);
+
+  const submitHandler = async (data, shippingOption) => {
+    // Save shipping address to Redux state
+    dispatch({ type: "SAVE_SHIPPING_ADDRESS", payload: data });
+
+    // Save shipping address to cookies
+    setCookie("shippingAddress", JSON.stringify(data));
+
+    // Prepare user info object
+    const userInfo = {
+      name: `${data.firstName} ${data.lastName}`,
+      contact: data.contact,
+      email: data.email,
+      address: data.address,
+      city: data.city,
+      country: data.country,
+      zipCode: data.zipCode,
+      shippingOption: shippingOption,
+    };
+
+    // Construct orderInfo object
+    const orderInfo = {
+      user_info: userInfo,
+      paymentMethod: data.paymentMethod,
+      status: "Pending",
+      cart: items,
+      subTotal: cartTotal,
+      shippingCost: shippingCost,
+      discount: discountAmount,
+      total: total,
+      shippingOption: shippingOption,
+    };
+
+    // Handle payment based on payment method
+    if (data.paymentMethod === "Card") {
+      // Payment logic with Stripe
+    } else if (data.paymentMethod === "Cash") {
+      // Submit order with shipping option
+      OrderServices.addOrder(orderInfo)
+        .then((res) => {
+          router.push(`/order/${res._id}`);
+          notifySuccess("Your Order Confirmed!");
+          // Clear cookies and session storage
+          Cookies.remove("couponInfo");
+          sessionStorage.removeItem("products");
+          emptyCart();
+        })
+        .catch((err) => {
+          notifyError(err.message);
+        });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(submitHandler)}>
+      {/* Form fields for address */}
+      <input name="address" type="text" placeholder="Address" ref={register} />
+      <input name="city" type="text" placeholder="City" ref={register} />
+      <input name="country" type="text" placeholder="Country" ref={register} />
+      <input name="zipCode" type="text" placeholder="Zip Code" ref={register} />
+
+      {/* Select field for shipping option */}
+      <select name="shippingOption" ref={register}>
+        <option value="Pickup">Pickup</option>
+        <option value="Deliver">Deliver</option>
+      </select>
+
+      {/* Other form fields and submit button */}
+    </form>
+  );
+};
+
+export default CheckoutForm;
+
+
+
+
+**Changes:**
+
+1. Add `addressLine`, `city`, `country`, and `zipCode` to the `register` function to enable validation and population of the address fields.
+2. Update the `handleSubmit` function to include the address fields in the `data` object.
+3. Remove the `currentLocation` state and instead use the `register` function to populate the address fields.
+
+**Code:**
+```jsx
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useCheckoutSubmit } from "@hooks/useCheckoutSubmit";
+
+const Checkout = () => {
+  const { register, handleSubmit, errors } = useForm();
+  const { submitHandler } = useCheckoutSubmit();
+
+  const [selectedOption, setSelectedOption] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
+  //...
+
+  return (
+    <form onSubmit={handleSubmit((data) => submitHandler(data, selectedOption))}>
+      <div className="form-group">
+        <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
+          03. Address Details
+        </h2>
+        <div className="grid grid-cols-6 gap-6 mb-8">
+          <div className="col-span-6">
+            <input
+              {...register("addressLine", { required: true })}
+              label="Street Address"
+              type="text"
+              placeholder="123 Boulevard Rd, Beverley Hills"
+              className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            />
+            <Error errorName={errors.addressLine} />
+          </div>
+          <div className="col-span-6 sm:col-span-6 lg:col-span-2">
+            <input
+              {...register("city", { required: true })}
+              label="City"
+              type="text"
+              placeholder="Los Angeles"
+              className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            />
+            <Error errorName={errors.city} />
+          </div>
+          <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+            <input
+              {...register("country", { required: true })}
+              label="Country"
+              type="text"
+              placeholder="United States"
+              className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            />
+            <Error errorName={errors.country} />
+          </div>
+          <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+            <input
+              {...register("zipCode", { required: true })}
+              label="Zip Code"
+              type="text"
+              placeholder="2345"
+              className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            />
+            <Error errorName={errors.zipCode} />
+          </div>
+        </div>
+      </div>
+      //...
+    </form>
+  );
+};
+
+const submitHandler = async (data, shippingOption) => {
+  // Save shipping address to Redux state
+  dispatch({ type: "SAVE_SHIPPING_ADDRESS", payload: data });
+
+  // Save shipping address to cookies
+  Cookies.set("shippingAddress", JSON.stringify(data));
+
+  // Prepare user info object
+  const userInfo = {
+    name: `${data.firstName} ${data.lastName}`,
+    contact: data.contact,
+    email: data.email,
+    address: data.address, // Include the address field
+    city: data.city, // Include the city field
+    country: data.country, // Include the country field
+    zipCode: data.zipCode, // Include the zipCode field
+    addressLine: data.user_info?.addressLine || "",
+    shippingOption: shippingOption || "", // Add default value for shipping option
+  };
+
+  // Construct orderInfo object
+  const orderInfo = {
+    user_info: userInfo,
+    paymentMethod: data.paymentMethod,
+    status: "Pending",
+    cart: items,
+    subTotal: cartTotal,
+    shippingCost: shippingCost,
+    discount: discountAmount,
+    total: total,
+  };
+
+  // Proceed with order submission
+  // Call the necessary API endpoint to submit the order
+};
+const handleMapSelection = (addressDetails) => {
+  setFormData({
+    address: addressDetails.addressLine || "",
+    city: addressDetails.city || "",
+    country: addressDetails.country || "",
+    zipCode: addressDetails.pincode || "",
+  });
+};
+
+
+import { useEffect, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import Cookies from "js-cookie";
+import * as dayjs from "dayjs";
+
+const DefaultFileName = () => {
+  const [map, setMap] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState({
+    addressLine: "",
+    city: "",
+    country: "",
+    zipCode: "",
+  });
+
+  useEffect(() => {
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiYWFkaTc2MiIsImEiOiJjbHZtMWM2aW0ybWFkMnZuMXg5YXR3djljIn0.vUj8hLhZWeAYIB07k9KMyA";
+
+    const initializeMap = () => {
+      const mapInstance = new mapboxgl.Map({
+        container: "map-container",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [78.9629, 20.5937], // India coordinates
+        zoom: 5,
+      });
+
+      mapInstance.addControl(
+        new MapboxGeocoder({
+          accessToken: mapboxgl.accessToken,
+          mapboxgl: mapboxgl,
+          countries: "IN",
+        })
+      );
+
+      mapInstance.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+
+      mapInstance.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+        })
+      );
+
+      mapInstance.on("moveend", () => {
+        const { lng, lat } = mapInstance.getCenter();
+        fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            const addressComponents = data.features[0].context || [];
+            const addressDetails = {
+              addressLine: "",
+              city: "",
+              country: "",
+              zipCode: "",
+            };
+
+            addressDetails.addressLine = data.features[0].place_name
+              .split(",")
+              .slice(0, -3)
+              .join(",");
+            addressComponents.forEach((component) => {
+              switch (component.id.split(".")[0]) {
+                case "place":
+                  addressDetails.city = component.text;
+                  break;
+                case "region":
+                  addressDetails.country = component.text;
+                  break;
+                case "postcode":
+                  addressDetails.zipCode = component.text;
+                  break;
+              }
+            });
+
+            setCurrentLocation(addressDetails);
+
+            document.getElementById("address-line").value =
+              addressDetails.addressLine || "";
+            document.getElementById("city").value = addressDetails.city || "";
+            document.getElementById("state").value = addressDetails.country || "";
+            document.getElementById("pincode").value = addressDetails.zipCode || "";
+          })
+          .catch((error) => {
+            console.error("Error fetching geocoding data:", error);
+          });
+      });
+
+      setMap(mapInstance);
+    };
+
+    if (!map) {
+      initializeMap();
+    }
+
+    return () => {
+      if (map) {
+        map.remove();
+      }
+    };
+  }, [map]);
+
+  const handleSubmit = () => {
+    if (!currentLocation.addressLine) {
+      alert("Address is required. Please select a valid address.");
+      return;
+    }
+
+    // Submit the form data or perform other actions
+    // Example: Save the address to a cookie
+    Cookies.set("userAddress", currentLocation.addressLine);
+
+    // Example: Log form submission timestamp
+    console.log("Form submitted at:", dayjs().format("YYYY-MM-DD HH:mm:ss"));
+  };
+
+  return (
+    <div id="location-address" className="form-group mt-12">
+      <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
+        03. Address Details
+      </h2>
+
+      <div className="grid grid-cols-6 gap-6 mb-8">
+        <div className="col-span-6">
+          <input
+            label="Street Address"
+            name="address"
+            id="address-line"
+            type="text"
+            placeholder="123 Boulevard Rd, Beverley Hills"
+            className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            value={currentLocation.addressLine}
+            readOnly
+          />
+        </div>
+
+        <div className="col-span-6 sm:col-span-6 lg:col-span-2">
+          <input
+            label="City"
+            name="city"
+            id="city"
+            type="text"
+            placeholder="Los Angeles"
+            className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            value={currentLocation.city}
+            readOnly
+          />
+        </div>
+
+        <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+          <input
+            label="Country"
+            name="country"
+            id="state"
+            type="text"
+            placeholder="United States"
+            className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            value={currentLocation.country}
+            readOnly
+          />
+        </div>
+
+        <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+          <input
+            label="ZIP/Postal Code"
+            name="zipCode"
+            id="pincode"
+            type="text"
+            placeholder="2345"
+            className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+            value={currentLocation.zipCode}
+            readOnly
+          />
+        </div>
+      </div>
+
+      <div id="map-container" className="h-96" />
+      
+
+
+      <button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Submit
+      </button>
+    </div>
+  );
+};
+
+export default DefaultFileName;
+
+
+
+import { useContext, useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useCart } from "react-use-cart";
+import { useStripe, useElements } from "@stripe/react-stripe-js";
+import OrderServices from "@services/OrderServices";
+import CouponServices from "@services/CouponServices";
+import SettingServices from "@services/SettingServices";
+import { notifyError, notifySuccess } from "@utils/toast";
+
+const useCheckoutSubmit = () => {
+  const {
+    state: { userInfo, shippingAddress },
+    dispatch,
+  } = useContext(UserContext);
+
+  const [error, setError] = useState("");
+  const [total, setTotal] = useState("");
+  const [couponInfo, setCouponInfo] = useState({});
+  const [minimumAmount, setMinimumAmount] = useState(0);
+  const [showCard, setShowCard] = useState(false);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountPercentage, setDiscountPercentage] = useState(0);
+  const [isCheckoutSubmit, setIsCheckoutSubmit] = useState(false);
+  const [isCouponApplied, setIsCouponApplied] = useState(false);
+
+  const router = useRouter();
+  const stripe = useStripe();
+  const elements = useElements();
+  const couponRef = useRef("");
+  const { isEmpty, emptyCart, items, cartTotal } = useCart();
+  const [currentLocation, setCurrentLocation] = useState({
+    addressLine: "",
+    city: "",
+    country: "",
+    zipCode: "",
+  });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const { data } = useAsync(CouponServices.getAllCoupons);
+  const { data: globalSetting } = useAsync(SettingServices.getGlobalSetting);
+  const currency = globalSetting?.default_currency || "$";
+
+  useEffect(() => {
+    if (Cookies.get("couponInfo")) {
+      const coupon = JSON.parse(Cookies.get("couponInfo"));
+      // console.log('coupon information',coupon)
+      setCouponInfo(coupon);
+      setDiscountPercentage(coupon.discountType);
+      setMinimumAmount(coupon.minimumAmount);
+    }
+  }, [isCouponApplied]);
+
+  //remove coupon if total value less then minimum amount of coupon
+  useEffect(() => {
+    if (minimumAmount - discountAmount > total || isEmpty) {
+      setDiscountPercentage(0);
+      Cookies.remove("couponInfo");
+    }
+  }, [minimumAmount, total]);
+
+  //calculate total and discount value
+  //calculate total and discount value
+  useEffect(() => {
+    const discountProductTotal = items?.reduce(
+      (preValue, currentValue) => preValue + currentValue.itemTotal,
+      0
+    );
+
+    let totalValue = "";
+    let subTotal = parseFloat(cartTotal + Number(shippingCost)).toFixed(2);
+    const discountAmount =
+      discountPercentage?.type === "fixed"
+        ? discountPercentage?.value
+        : discountProductTotal * (discountPercentage?.value / 100);
+
+    const discountAmountTotal = discountAmount ? discountAmount : 0;
+
+    totalValue = Number(subTotal) - discountAmountTotal;
+
+    setDiscountAmount(discountAmountTotal);
+
+    setTotal(totalValue);
+  }, [cartTotal, shippingCost, discountPercentage]);
+
+  //if not login then push user to home page
+  useEffect(() => {
+    if (userInfo) {
+      router.push("/");
+    }
+
+    setValue("firstName", shippingAddress.firstName);
+    setValue("lastName", shippingAddress.lastName);
+    setValue("email", shippingAddress.email);
+    setValue("phoneNumber", shippingAddress.phoneNumber);
+    setValue("addressLine", shippingAddress.addressLine);
+    setValue("city", shippingAddress.city);
+    setValue("country", shippingAddress.country);
+    setValue("zipCode", shippingAddress.zipCode);
+  }, []);
+
+  const onSubmit = async (data) => {
+    setError("");
+    setIsCheckoutSubmit(true);
+
+    const cardElement = elements.getElement(CardElement);
+
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardElement,
+    });
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    const { order, success, message } = await OrderServices.placeOrder({
+      userId: userInfo.id,
+      cartItems: items,
+      total: total,
+      paymentMethodId: paymentMethod.id,
+      shippingCost: shippingCost,
+      couponId: couponInfo?.id,
+      billingAddress: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        addressLine: data.addressLine,
+        city: data.city,
+        country: data.country,
+        zipCode: data.zipCode,
+      },
+      shippingAddress: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        addressLine: data.addressLine,
+        city: data.city,
+        country: data.country,
+        zipCode: data.zipCode,
+      },
+    });
+
+    if (success) {
+      dispatch({ type: "LOGIN", payload: userInfo });
+      emptyCart();
+      notifySuccess(message);
+      router.push("/");
+    } else {
+      notifyError(message);
+    }
+
+    setIsCheckoutSubmit(false);
+  };
+
+  const handleApplyCoupon = async () => {
+    const { error, coupon } = await CouponServices.applyCoupon(couponRef.current.value);
+
+    if (error) {
+      notifyError(error.message);
+      return;
+    }
+
+    notifySuccess("Coupon applied successfully.");
+    setCouponInfo(coupon);
+    setIsCouponApplied(true);
+  };
+
+  return {
+    register,
+    handleSubmit,
+    errors,
+    setValue,
+    error,
+    onSubmit,
+    showCard,
+    setShowCard,
+    total,
+    shippingCost,
+    setShippingCost,
+    couponInfo,
+    isCheckoutSubmit,
+    couponRef,
+    handleApplyCoupon,
+    minimumAmount,
+    discountPercentage,
+    setCouponInfo,
+    currentLocation,
+    setCurrentLocation,
+  };
+};
+
+export default useCheckoutSubmit;
+
+
+
+
+const handleShippingOptionChange = (value) => {
+  setSelectedOption(value);
+};
+
+const getSelectedOptionLabel = () => {
+  switch (selectedOption) {
+    case "Deliver":
+      return "Delivery";
+    case "Pickup":
+      return "Pickup";
+    default:
+      return "";
+  }
+};
+
+// ...
+
+<div className="form-group mt-12">
+  <h2 className="font-semibold font-serif text-base text-gray-700 pb-3">
+    02. {t("Service Mode Type")}
+  </h2>
+  <div className="grid grid-cols-6 gap-6">
+    <div className="col-span-6 sm:col-span-3">
+      <div className="px-3 py-4 card border border-gray-200 bg-white rounded-md">
+        <label className="cursor-pointer label">
+          <div className="flex item-center justify-between">
+            <div className="flex items-center">
+              <h6 className="font-serif font-medium text-sm text-gray-600">
+                Delivery
+              </h6>
+            </div>
+            <input
+              name="shippingOption"
+              type="radio"
+              className="form-radio outline-none focus:ring-0 text-emerald-500"
+              value="Deliver"
+              checked={selectedOption === "Deliver"}
+              onChange={handleShippingOptionChange}
+            />
+          </div>
+        </label>
+      </div>
+    </div>
+    <div className="col-span-6 sm:col-span-3">
+      <div className="px-3 py-4 card border border-gray-200 bg-white rounded-md">
+        <label className="cursor-pointer label">
+          <div className="flex item-center justify-between">
+            <div className="flex items-center">
+              <h6 className="font-serif font-medium text-sm text-gray-600">
+                Pickup
+              </h6>
+            </div>
+            <input
+              name="shippingOption"
+              type="radio"
+              className="form-radio outline-none focus:ring-0 text-emerald-500"
+              value="Pickup"
+              checked={selectedOption === "Pickup"}
+              onChange={handleShippingOptionChange}
+            />
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+  {getSelectedOptionLabel() && <div>{getSelectedOptionLabel()}</div>}
+</div>
+const submitHandler = async (data, shippingOption) => {
+  // Save shipping address to Redux state
+  dispatch({ type: "SAVE_SHIPPING_ADDRESS", payload: data });
+
+  // Save shipping address to cookies
+  Cookies.set("shippingAddress", JSON.stringify(data));
+
+  // Prepare user info object
+  const userInfo = {
+    name: `${data.firstName} ${data.lastName}`,
+    contact: data.contact,
+    email: data.email,
+    address: data.address,
+    city: data.city,
+    country: data.country,
+    zipCode: data.zipCode,
+  };
+
+  // Construct orderInfo object
+  const orderInfo = {
+    user_info: userInfo,
+    paymentMethod: data.paymentMethod,
+    status: "Pending",
+    cart: items,
+    subTotal: cartTotal,
+    shippingCost: shippingCost,
+    discount: discountAmount,
+    total: total,
+    shippingOption: shippingOption.value, // use shippingOption parameter instead of data.shippingOption
+  };
+
+  // Handle payment based on payment method
+  if (data.paymentMethod === "Card") {
+    // Payment logic with Stripe
+  } else if (data.paymentMethod === "Cash") {
+    // Submit order with shipping option
+    OrderServices.addOrder(orderInfo)
+      .then((res) => {
+        router.push(`/order/${res._id}`);
+        notifySuccess("Your Order Confirmed!");
+        // Clear cookies and session storage
+        Cookies.remove("couponInfo");
+        sessionStorage.removeItem("products");
+        emptyCart();
+      })
+      .catch((err) => {
+        notifyError(err.message);
+      });
+  }
+};
+<input
+  register={register}
+  label={t("common:streetAddress")}
+  name="user_info.addressLine"
+  id="address-line"
+  type="text"
+  placeholder="123 Boulevard Rd, Beverley Hills"
+  className="py-2 px-4 md:px-5 w-full appearance-none border text-sm opacity-75 text-input rounded-md placeholder-body min-h-12 transition duration-200 focus:ring-0 ease-in-out bg-white border-gray-200 focus:outline-none focus:border-emerald-500 h-11 md:h-12"
+  value={currentLocation?.addressLine || ""}
+/>

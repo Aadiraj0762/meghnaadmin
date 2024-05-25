@@ -54,7 +54,7 @@ const Dashboard = ({ title, description, children }) => {
 
   useEffect(() => {
     setIsLoading(false);
-    if (!userInfo) {
+    if (userInfo) {
       router.push("/");
     }
   }, [userInfo]);

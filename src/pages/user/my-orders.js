@@ -44,7 +44,7 @@ const MyOrders = () => {
 
   useEffect(() => {
     setIsLoading(false);
-    if (!userInfo) {
+    if (userInfo) {
       router.push("/");
     }
   }, [userInfo]);
