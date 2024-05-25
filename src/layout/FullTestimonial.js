@@ -2,7 +2,7 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import img1 from "../../public/user.png";
+// import img1 from "../../public/user.png";
 const testimonials = [
   {
     id: 1,
